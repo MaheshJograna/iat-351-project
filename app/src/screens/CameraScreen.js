@@ -113,8 +113,8 @@ export default function CameraScreen({ navigation, route }) {
           ) : (
             <View style={styles.previewButtons}>
               <TouchableOpacity style={styles.retakeButton} onPress={() => { setPhoto(null); setBase64Image(null); }}>
-                <Ionicons name="refresh" size={24} color="#fff" />
-                <Text style={{ color: '#fff', fontSize: 12 }}>Retake</Text>
+                <Ionicons name="close-circle-outline" size={28} color="#ccc" />
+                <Text style={{ color: '#ccc', fontSize: 14, marginTop: 4 }}>Retake</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.postButton} onPress={handlePost}>
                 <Text style={styles.buttonText}>Share to Community</Text>
@@ -141,9 +141,9 @@ const styles = StyleSheet.create({
   controlsArea: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   captureButton: { width: 75, height: 75, borderRadius: 40, backgroundColor: 'rgba(255,255,255,0.3)', justifyContent: 'center', alignItems: 'center' },
   innerCapture: { width: 58, height: 58, borderRadius: 30, backgroundColor: '#fff' },
-  previewButtons: { flexDirection: 'row', gap: 20, alignItems: 'center' },
+  previewButtons: { flexDirection: 'row', width: '100%', paddingHorizontal: 30, justifyContent: 'space-between', alignItems: 'center' },
   retakeButton: { alignItems: 'center', padding: 10 },
-  postButton: { flexDirection: 'row', backgroundColor: '#2D6A4F', paddingVertical: 14, paddingHorizontal: 28, borderRadius: 25, alignItems: 'center' },
+  postButton: { flexDirection: 'row', backgroundColor: '#2D6A4F', paddingVertical: 16, paddingHorizontal: 24, borderRadius: 30, alignItems: 'center', elevation: 5 },
   buttonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
   permButton: { marginTop: 20, backgroundColor: '#2D6A4F', padding: 12, borderRadius: 8 },
 });

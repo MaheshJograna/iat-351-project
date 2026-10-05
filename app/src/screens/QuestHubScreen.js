@@ -42,7 +42,19 @@ export default function QuestHubScreen({ navigation }) {
   const handleReroll = async (questId) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (rerollTokens <= 0) {
-      Alert.alert('No Tokens', 'Purchase more using your points.');
+      Alert.alert(
+        'Out of Tokens', 
+        'Spend 50 points to buy a token and reroll this quest immediately?', 
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Buy & Reroll', onPress: async () => { 
+              await useSkipToGainReroll(); 
+              const result = await rerollDailyQuest(questId);
+              if (result.success) Alert.alert('Rerolled', result.message);
+              else Alert.alert('Reroll Failed', result.message);
+          }}
+        ]
+      );
       return;
     }
     const result = await rerollDailyQuest(questId);
