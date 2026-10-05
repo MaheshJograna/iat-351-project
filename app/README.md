@@ -29,7 +29,7 @@ Launch the Expo development server:
 ```bash
 npx expo start
 ```
-*   *Tip:* If you encounter cache or bundling issues, clear the cache by running:
+*   If you encounter cache or bundling issues, clear the cache by running:
     ```bash
     npx expo start --clear
     ```
