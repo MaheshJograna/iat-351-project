@@ -16,11 +16,7 @@ Before you begin, ensure you have the following installed on your machine:
 Follow these steps to clone the repository and run the app locally on your device:
 
 ### 1. Clone the Repository
-Open your terminal and run:
-\`\`\`bash
-git clone <YOUR_REPOSITORY_URL_HERE>
-cd <YOUR_PROJECT_FOLDER_NAME>
-\`\`\`
+
 
 ### 2. Install Dependencies
 Install all required project packages using npm:
