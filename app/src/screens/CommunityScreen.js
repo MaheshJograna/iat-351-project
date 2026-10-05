@@ -184,7 +184,6 @@ export default function CommunityScreen() {
     );
   };
 
-  // Compute Leaderboard data dynamically based on Global/Following filter & Search query
   const getLeaderboardData = () => {
     let list = leaderboard;
     if (feedFilter === 'following') {
@@ -236,15 +235,16 @@ export default function CommunityScreen() {
       </View>
 
       <View style={styles.contentContainer}>
-        {/* Global / Following Filter Toggle shared across both tabs */}
-        <View style={styles.subTabContainer}>
-          <TouchableOpacity style={[styles.subTabBtn, feedFilter === 'global' && styles.activeSubTab]} onPress={() => setFeedFilter('global')}>
-            <Text style={[styles.subTabText, feedFilter === 'global' && styles.activeSubTabText]}>Global</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.subTabBtn, feedFilter === 'following' && styles.activeSubTab]} onPress={() => setFeedFilter('following')}>
-            <Text style={[styles.subTabText, feedFilter === 'following' && styles.activeSubTabText]}>Following</Text>
-          </TouchableOpacity>
-        </View>
+        {activeTab === 'feed' && (
+          <View style={styles.subTabContainer}>
+            <TouchableOpacity style={[styles.subTabBtn, feedFilter === 'global' && styles.activeSubTab]} onPress={() => setFeedFilter('global')}>
+              <Text style={[styles.subTabText, feedFilter === 'global' && styles.activeSubTabText]}>Global</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.subTabBtn, feedFilter === 'following' && styles.activeSubTab]} onPress={() => setFeedFilter('following')}>
+              <Text style={[styles.subTabText, feedFilter === 'following' && styles.activeSubTabText]}>Following</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {activeTab === 'leaderboard' && (
           <View style={styles.searchBar}>
@@ -331,6 +331,24 @@ export default function CommunityScreen() {
                     <Image source={{ uri: item.imageURL }} style={styles.postImage} resizeMode="cover" />
                   ) : null}
 
+                  {/* DISPLAYING THE AWARDS ON THE POST */}
+                  {item.awards && Object.keys(item.awards).length > 0 && (
+                    <View style={styles.postAwardsContainer}>
+                      {Object.entries(item.awards).map(([awardId, count]) => {
+                        if (count > 0) {
+                          const awardDef = AWARDS.find(a => a.id === awardId);
+                          return awardDef ? (
+                            <View key={awardId} style={styles.postAwardBadge}>
+                              <Text style={styles.postAwardIcon}>{awardDef.icon}</Text>
+                              <Text style={styles.postAwardCount}>{count}</Text>
+                            </View>
+                          ) : null;
+                        }
+                        return null;
+                      })}
+                    </View>
+                  )}
+
                   <View style={styles.socialBar}>
                     <TouchableOpacity style={styles.socialBtn} onPress={() => handleLike(item)}>
                       <Ionicons name={isLiked ? "heart" : "heart-outline"} size={22} color={isLiked ? "#E76F51" : "#444"} />
@@ -408,6 +426,13 @@ const styles = StyleSheet.create({
   postTitle: { fontWeight: '700', color: '#1B4332', fontSize: 16, flexShrink: 1 },
   postDesc: { color: '#555', fontSize: 14, lineHeight: 20 },
   postImage: { width: '100%', aspectRatio: 1, backgroundColor: '#F4F7F5' }, 
+  
+  // NEW: Award Container Styles
+  postAwardsContainer: { flexDirection: 'row', paddingHorizontal: 14, paddingTop: 10, paddingBottom: 4, flexWrap: 'wrap', gap: 8, backgroundColor: '#FAFCFA' },
+  postAwardBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', paddingVertical: 4, paddingHorizontal: 8, borderRadius: 12, borderWidth: 1, borderColor: '#EBF4EE' },
+  postAwardIcon: { fontSize: 14, marginRight: 4 },
+  postAwardCount: { fontSize: 13, fontWeight: 'bold', color: '#2D6A4F' },
+
   socialBar: { flexDirection: 'row', padding: 14, alignItems: 'center', backgroundColor: '#FAFCFA', borderTopWidth: 1, borderTopColor: '#F0F0F0' },
   socialBtn: { flexDirection: 'row', alignItems: 'center', marginRight: 24 },
   socialText: { marginLeft: 6, fontSize: 14, fontWeight: '800', color: '#555' },
