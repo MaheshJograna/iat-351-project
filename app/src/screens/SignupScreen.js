@@ -6,22 +6,25 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
 import { assignDailyQuests } from '../dailyQuestUtils';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const insets = useSafeAreaInsets(); // Dynamically grabs notch/island height
 
   const handleSignup = async () => {
     if (!email || !password) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
     }
+    
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
+      
       await setDoc(doc(db, 'Users', user.uid), {
         email: user.email,
         score: 0,
@@ -31,8 +34,8 @@ export default function SignupScreen({ navigation }) {
         dailyQuests: [],
         onboardingComplete: false,
       });
-
-      await assignDailyQuests(); 
+      
+      await assignDailyQuests();
     } catch (error) {
       Alert.alert("Signup Failed", error.message);
     } finally {
@@ -42,7 +45,16 @@ export default function SignupScreen({ navigation }) {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      
+      {/* NEW: Absolute positioned back button with dynamic safe area padding */}
+      <TouchableOpacity 
+        style={[styles.backButton, { top: Math.max(insets.top + 10, 40) }]} 
+        onPress={() => navigation.navigate('Login')}
+      >
+        <Ionicons name="arrow-back" size={28} color="#fff" />
+      </TouchableOpacity>
+
+      <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
         <View style={styles.headerContainer}>
           <Text style={styles.appTitle}>Join the Community</Text>
           <Text style={styles.tagline}>Start your daily climate micro-actions.</Text>
@@ -51,12 +63,29 @@ export default function SignupScreen({ navigation }) {
         <View style={styles.card}>
           <View style={styles.inputContainer}>
             <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="Email Address" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholderTextColor="#999" />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Email Address"
+              value={email} 
+              onChangeText={setEmail} 
+              keyboardType="email-address"
+              autoCapitalize="none" 
+              placeholderTextColor="#999" 
+            />
           </View>
+
           <View style={styles.inputContainer}>
             <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry placeholderTextColor="#999" />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Password"
+              value={password} 
+              onChangeText={setPassword} 
+              secureTextEntry
+              placeholderTextColor="#999" 
+            />
           </View>
+
           <TouchableOpacity style={styles.signupButton} onPress={handleSignup} disabled={loading}>
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Create Account</Text>}
           </TouchableOpacity>
@@ -75,6 +104,7 @@ export default function SignupScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#2D6A4F' },
+  backButton: { position: 'absolute', left: 20, zIndex: 10, padding: 10 },
   scrollContainer: { flexGrow: 1, justifyContent: 'center', padding: 20 },
   headerContainer: { alignItems: 'center', marginBottom: 25 },
   appTitle: { fontSize: 28, fontWeight: 'bold', color: '#fff' },

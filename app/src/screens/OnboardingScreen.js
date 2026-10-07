@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { db, auth } from '../firebaseConfig';
 import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 
 const CLIMATE_TAGS = ["Energy", "Mobility", "Food", "Digital", "Home", "Consumption", "Fitness"];
 const { width } = Dimensions.get('window');
@@ -15,11 +16,19 @@ export default function OnboardingScreen() {
   const [selectedInterests, setSelectedInterests] = useState([]); 
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
-  const insets = useSafeAreaInsets(); // Dynamically grabs notch/island height
+  const insets = useSafeAreaInsets();
 
   const toggleTag = (tag) => {
     if (selectedInterests.includes(tag)) setSelectedInterests(selectedInterests.filter(t => t !== tag));
     else setSelectedInterests([...selectedInterests, tag]);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (e) {
+      Alert.alert("Error", "Could not return to login.");
+    }
   };
 
   const finish = async () => {
@@ -64,15 +73,24 @@ export default function OnboardingScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-      {/* Pushed down dynamically to avoid the Dynamic Island */}
+      
+      <TouchableOpacity 
+        style={[styles.backButton, { top: Math.max(insets.top + 10, 40) }]} 
+        onPress={handleLogout}
+      >
+        <Ionicons name="arrow-back" size={28} color="#fff" />
+      </TouchableOpacity>
+
       <View style={[styles.headerContainer, { marginTop: insets.top + 15 }]}>
         <Ionicons name="earth" size={65} color="#fff" />
         
+        {/* Updated Pagination to 5 dots */}
         <View style={styles.pagination}>
           <View style={[styles.dot, step === 0 && styles.activeDot]} />
           <View style={[styles.dot, step === 1 && styles.activeDot]} />
           <View style={[styles.dot, step === 2 && styles.activeDot]} />
           <View style={[styles.dot, step === 3 && styles.activeDot]} />
+          <View style={[styles.dot, step === 4 && styles.activeDot]} />
         </View>
         <Text style={styles.swipeHint}>Swipe to continue</Text>
       </View>
@@ -85,16 +103,18 @@ export default function OnboardingScreen() {
         onMomentumScrollEnd={handleScroll}
         keyboardShouldPersistTaps="handled" 
       >
+        {/* Slide 0 */}
         <View style={styles.slide}>
           <View style={styles.card}>
             <View style={styles.iconCircle}>
               <Ionicons name="leaf" size={40} color="#2D6A4F" />
             </View>
-            <Text style={styles.cardHeader}>Welcome to APP NAME</Text>
-            <Text style={styles.bodyText}>Turn climate anxiety into positive action. APP NAME gives you bite-sized daily challenges that make a real-world environmental impact.</Text>
+            <Text style={styles.cardHeader}>Welcome to (App Name)</Text>
+            <Text style={styles.bodyText}>Turn climate anxiety into positive action. (App Name) gives you bite-sized daily challenges that make a real-world environmental impact.</Text>
           </View>
         </View>
 
+        {/* Slide 1 */}
         <View style={styles.slide}>
           <View style={styles.card}>
             <Text style={styles.cardHeader}>Your Public Handle</Text>
@@ -113,6 +133,7 @@ export default function OnboardingScreen() {
           </View>
         </View>
 
+        {/* Slide 2 */}
         <View style={styles.slide}>
           <View style={styles.card}>
             <Text style={styles.cardHeader}>How It Works</Text>
@@ -143,6 +164,38 @@ export default function OnboardingScreen() {
           </View>
         </View>
 
+        {/* Slide 3 (NEW) */}
+        <View style={styles.slide}>
+          <View style={styles.card}>
+            <Text style={styles.cardHeader}>Ranks & Rewards</Text>
+            
+            <View style={styles.featureRow}>
+              <View style={styles.featureIconBox}><Text style={{ fontSize: 24 }}>🌍</Text></View>
+              <View style={styles.featureTextContainer}>
+                <Text style={styles.featureTitle}>Eco-Titles</Text>
+                <Text style={styles.featureDesc}>Earn points to upgrade your profile status from a tiny Seedling to a Global Guardian.</Text>
+              </View>
+            </View>
+
+            <View style={styles.featureRow}>
+              <View style={styles.featureIconBox}><Ionicons name="camera" size={24} color="#52B788" /></View>
+              <View style={styles.featureTextContainer}>
+                <Text style={styles.featureTitle}>Share Your Story</Text>
+                <Text style={styles.featureDesc}>Add an optional photo and caption when completing a quest to inspire your peers.</Text>
+              </View>
+            </View>
+
+            <View style={styles.featureRow}>
+              <View style={styles.featureIconBox}><Ionicons name="gift" size={24} color="#E9C46A" /></View>
+              <View style={styles.featureTextContainer}>
+                <Text style={styles.featureTitle}>Peer Encouragement</Text>
+                <Text style={styles.featureDesc}>Spend your earned points to send digital awards to community members.</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Slide 4 */}
         <View style={styles.slide}>
           <View style={styles.card}>
             <Text style={styles.cardHeader}>Action Domains</Text>
@@ -172,13 +225,12 @@ export default function OnboardingScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#2D6A4F' }, 
+  backButton: { position: 'absolute', left: 20, zIndex: 10, padding: 10 },
   headerContainer: { alignItems: 'center', marginBottom: 10 },
   pagination: { flexDirection: 'row', marginTop: 20, gap: 8 },
   dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.3)' },
   activeDot: { backgroundColor: '#fff' },
   swipeHint: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 10, fontWeight: 'bold', textTransform: 'uppercase' },
-  
-  // Increased paddingBottom to 100 to push the white card much higher up the screen
   slide: { width: width, height: '100%', paddingHorizontal: 20, justifyContent: 'center', paddingBottom: 100 }, 
   card: { backgroundColor: '#fff', borderRadius: 20, padding: 25, elevation: 6, width: '100%' },
   iconCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#EBF4EE', justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 20 },
