@@ -12,7 +12,7 @@ export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const insets = useSafeAreaInsets(); // Dynamically grabs notch/island height
+  const insets = useSafeAreaInsets();
 
   const handleSignup = async () => {
     if (!email || !password) {
@@ -46,7 +46,6 @@ export default function SignupScreen({ navigation }) {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       
-      {/* NEW: Absolute positioned back button with dynamic safe area padding */}
       <TouchableOpacity 
         style={[styles.backButton, { top: Math.max(insets.top + 10, 40) }]} 
         onPress={() => navigation.navigate('Login')}

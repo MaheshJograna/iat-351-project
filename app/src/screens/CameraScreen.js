@@ -113,7 +113,6 @@ export default function CameraScreen({ navigation, route }) {
   return (
     <SafeAreaView style={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        {/* Added keyboardVerticalOffset to push the button higher above the iOS keyboard */}
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={40} style={{ flex: 1, width: '100%', alignItems: 'center' }}>
           
           <View style={styles.headerArea}>

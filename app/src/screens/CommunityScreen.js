@@ -527,7 +527,6 @@ export default function CommunityScreen() {
 const styles = StyleSheet.create({
   mainContainer: { flex: 1, backgroundColor: '#F4F7F5' },
   
-  // EXACT QUEST HUB HEADER MATCH: paddingBottom: 25, paddingTop: 10, marginTop: 10
   headerBackground: { backgroundColor: '#2D6A4F', paddingBottom: 25, borderBottomLeftRadius: 25, borderBottomRightRadius: 25, paddingTop: 10 },
   headerContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, marginTop: 10 },
   greetingText: { color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: '600' },
