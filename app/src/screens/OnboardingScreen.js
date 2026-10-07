@@ -1,7 +1,7 @@
 // src/screens/OnboardingScreen.js
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, Dimensions, TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, Dimensions, TextInput, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { db, auth } from '../firebaseConfig';
 import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
@@ -15,6 +15,7 @@ export default function OnboardingScreen() {
   const [selectedInterests, setSelectedInterests] = useState([]); 
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
+  const insets = useSafeAreaInsets(); // Dynamically grabs notch/island height
 
   const toggleTag = (tag) => {
     if (selectedInterests.includes(tag)) setSelectedInterests(selectedInterests.filter(t => t !== tag));
@@ -33,7 +34,6 @@ export default function OnboardingScreen() {
     
     setLoading(true);
     try {
-      // Check if username is already taken in Firestore
       const q = query(collection(db, 'Users'), where('userDisplayName', '==', trimmedName));
       const querySnapshot = await getDocs(q);
       
@@ -63,11 +63,11 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      {/* Pushed down dynamically to avoid the Dynamic Island */}
+      <View style={[styles.headerContainer, { marginTop: insets.top + 15 }]}>
         <Ionicons name="earth" size={65} color="#fff" />
         
-        {/* Progress Dots */}
         <View style={styles.pagination}>
           <View style={[styles.dot, step === 0 && styles.activeDot]} />
           <View style={[styles.dot, step === 1 && styles.activeDot]} />
@@ -83,9 +83,8 @@ export default function OnboardingScreen() {
         pagingEnabled 
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleScroll}
-        contentContainerStyle={styles.scrollTrack}
+        keyboardShouldPersistTaps="handled" 
       >
-        {/* Step 0: Welcome */}
         <View style={styles.slide}>
           <View style={styles.card}>
             <View style={styles.iconCircle}>
@@ -96,7 +95,6 @@ export default function OnboardingScreen() {
           </View>
         </View>
 
-        {/* Step 1: Identity & Accountability */}
         <View style={styles.slide}>
           <View style={styles.card}>
             <Text style={styles.cardHeader}>Your Public Handle</Text>
@@ -109,11 +107,12 @@ export default function OnboardingScreen() {
               value={displayName}
               onChangeText={setDisplayName}
               maxLength={20}
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
             />
           </View>
         </View>
 
-        {/* Step 2: Mechanics */}
         <View style={styles.slide}>
           <View style={styles.card}>
             <Text style={styles.cardHeader}>How It Works</Text>
@@ -144,7 +143,6 @@ export default function OnboardingScreen() {
           </View>
         </View>
 
-        {/* Step 3: Personalization */}
         <View style={styles.slide}>
           <View style={styles.card}>
             <Text style={styles.cardHeader}>Action Domains</Text>
@@ -168,37 +166,35 @@ export default function OnboardingScreen() {
         </View>
 
       </ScrollView>
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#2D6A4F' },
-  headerContainer: { alignItems: 'center', marginTop: 40, marginBottom: 20 },
+  container: { flex: 1, backgroundColor: '#2D6A4F' }, 
+  headerContainer: { alignItems: 'center', marginBottom: 10 },
   pagination: { flexDirection: 'row', marginTop: 20, gap: 8 },
   dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.3)' },
   activeDot: { backgroundColor: '#fff' },
   swipeHint: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 10, fontWeight: 'bold', textTransform: 'uppercase' },
-  scrollTrack: { alignItems: 'center' },
-  slide: { width: width, paddingHorizontal: 20, justifyContent: 'center' },
+  
+  // Increased paddingBottom to 100 to push the white card much higher up the screen
+  slide: { width: width, height: '100%', paddingHorizontal: 20, justifyContent: 'center', paddingBottom: 100 }, 
   card: { backgroundColor: '#fff', borderRadius: 20, padding: 25, elevation: 6, width: '100%' },
   iconCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#EBF4EE', justifyContent: 'center', alignItems: 'center', alignSelf: 'center', marginBottom: 20 },
   cardHeader: { fontSize: 24, fontWeight: 'bold', color: '#1B4332', textAlign: 'center', marginBottom: 15 },
   bodyText: { fontSize: 15, color: '#555', textAlign: 'center', lineHeight: 22, marginBottom: 25 },
   input: { borderWidth: 1, borderColor: '#ddd', backgroundColor: '#F9F9F9', padding: 15, borderRadius: 12, fontSize: 16, marginBottom: 20, color: '#333' },
-  
   featureRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
   featureIconBox: { width: 50, height: 50, borderRadius: 15, backgroundColor: '#F4F7F5', justifyContent: 'center', alignItems: 'center', marginRight: 15 },
   featureTextContainer: { flex: 1 },
   featureTitle: { fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 4 },
   featureDesc: { fontSize: 13, color: '#666', lineHeight: 18 },
-  
   tagContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginBottom: 30 },
   tagButton: { backgroundColor: '#f0f0f0', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20 },
   tagActive: { backgroundColor: '#2D6A4F' },
   tagText: { color: '#444', fontWeight: '600' },
   tagActiveText: { color: '#fff' },
-  
   startButton: { backgroundColor: '#52B788', padding: 16, borderRadius: 12, alignItems: 'center', justifyContent: 'center', width: '100%' },
   buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });

@@ -16,7 +16,7 @@ const AWARDS = [
 
 export default function CommunityScreen() {
   const [activeTab, setActiveTab] = useState('feed'); 
-  const [feedFilter, setFeedFilter] = useState('global'); // 'global' or 'following'
+  const [feedFilter, setFeedFilter] = useState('global');
   const [following, setFollowing] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
   const [feed, setFeed] = useState([]);
@@ -331,6 +331,16 @@ export default function CommunityScreen() {
                     <Image source={{ uri: item.imageURL }} style={styles.postImage} resizeMode="cover" />
                   ) : null}
 
+                  {/* USER CAPTION DISPLAY */}
+                  {item.userCaption ? (
+                    <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 }}>
+                      <Text style={{ fontSize: 14, color: '#333', lineHeight: 20 }}>
+                        <Text style={{ fontWeight: 'bold', color: '#1B4332' }}>{item.userDisplayName} </Text>
+                        {item.userCaption}
+                      </Text>
+                    </View>
+                  ) : null}
+
                   {/* DISPLAYING THE AWARDS ON THE POST */}
                   {item.awards && Object.keys(item.awards).length > 0 && (
                     <View style={styles.postAwardsContainer}>
@@ -427,7 +437,6 @@ const styles = StyleSheet.create({
   postDesc: { color: '#555', fontSize: 14, lineHeight: 20 },
   postImage: { width: '100%', aspectRatio: 1, backgroundColor: '#F4F7F5' }, 
   
-  // NEW: Award Container Styles
   postAwardsContainer: { flexDirection: 'row', paddingHorizontal: 14, paddingTop: 10, paddingBottom: 4, flexWrap: 'wrap', gap: 8, backgroundColor: '#FAFCFA' },
   postAwardBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', paddingVertical: 4, paddingHorizontal: 8, borderRadius: 12, borderWidth: 1, borderColor: '#EBF4EE' },
   postAwardIcon: { fontSize: 14, marginRight: 4 },
