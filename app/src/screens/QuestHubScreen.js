@@ -95,7 +95,7 @@ export default function QuestHubScreen({ navigation }) {
 
       <ScrollView style={styles.scrollContainer} contentContainerStyle={{ paddingBottom: 40 }}>
         
-        {/* Eco Tip replacing the old Weather widget */}
+        {/* Eco Tip */}
         <View style={styles.weatherCard}>
           <View style={styles.weatherRow}>
             <View style={{ flex: 1, paddingRight: 10 }}>
